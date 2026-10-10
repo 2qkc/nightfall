@@ -1,78 +1,45 @@
 const express = require('express');
-const multer = require('multer');
-const ffmpeg = require('fluent-ffmpeg');
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-const fs = require('fs');
+const { exec } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
-// تعيين مسار الـ ffmpeg تلقائياً ليعمل على سيرفر Render
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
-
-// رفع حد حجم البيانات المستقبلة للملفات الكبيرة (500 ميجابايت)
-app.use(express.json({ limit: '500mb' }));
-app.use(express.urlencoded({ limit: '500mb', extended: true }));
-
-// زيادة مهلة الاتصال للسيرفر (10 دقائق) لتجنب انقطاع الرفع
-app.use((req, res, next) => {
-    req.setTimeout(600000);
-    res.setTimeout(600000);
-    next();
-});
-
-// التأكد من وجود مجلدات الحفظ
-if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
-if (!fs.existsSync('outputs')) fs.mkdirSync('outputs');
-
-// إعداد استقبال الملفات المؤقتة
-const upload = multer({ dest: 'uploads/' });
-
-// نقطة استقبال الفيديو ومعالجته
-app.post('/process-video', upload.single('video'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('لم يتم إرسال أي ملف فيديو.');
+// مسار معالجة الفيديو بالـ FFmpeg للسيرفر
+app.post('/process-video', (req, res) => {
+    const { inputPath } = req.body;
+    
+    if (!inputPath || !fs.existsSync(inputPath)) {
+        return res.status(400).json({ error: 'مسار الفيديو غير موجود أو غير صحيح' });
     }
 
-    const inputPath = req.file.path;
-    const outputFileName = `processed_${Date.now()}.mp4`;
-    const outputPath = path.join('outputs', outputFileName);
+    const outputFileName = `NIGHTFALL_SERVER_${Date.now()}.mp4`;
+    const outputPath = path.join(__dirname, 'downloads', outputFileName);
 
-    console.log(`[RENDER] Starting processing for: ${req.file.originalname}`);
+    // تأكد من وجود مجلد التحميلات
+    if (!fs.existsSync(path.join(__dirname, 'downloads'))) {
+        fs.mkdirSync(path.join(__dirname, 'downloads'));
+    }
 
-    ffmpeg(inputPath)
-        .videoCodec('libx264')
-        .outputOptions([
-            '-crf 18',
-            '-preset slow',
-            '-pix_fmt yuv420p',
-            '-movflags +faststart',
-            '-metadata title="NightFall Ultra 4K"'
-        ])
-        .save(outputPath)
-        .on('end', () => {
-            console.log(`[SUCCESS] Processing finished: ${outputFileName}`);
-            res.download(outputPath, outputFileName, (err) => {
-                try {
-                    fs.unlinkSync(inputPath);
-                    fs.unlinkSync(outputPath);
-                } catch (e) {}
-            });
-        })
-        .on('error', (err) => {
-            console.error('Render Error:', err);
-            res.status(500).send('فشل الرندر والمعالجة على السيرفر');
-            try {
-                fs.unlinkSync(inputPath);
-            } catch (e) {}
+    // أمر الـ FFmpeg المعدل لتجاوز ضغط تيك توك والحفاظ على الجودة
+    const ffmpegCommand = `ffmpeg -i "${inputPath}" -c:v libx264 -profile:v high -level 4.1 -crf 18 -preset medium -pix_fmt yuv420p -r 60 -g 120 -b:v 6M -b:a 192k -map_metadata -1 -movflags +faststart "${outputPath}"`;
+
+    exec(ffmpegCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`خطأ في المعالجة: ${error.message}`);
+            return res.status(500).json({ error: error.message });
+        }
+
+        res.json({
+            success: true,
+            message: 'تمت معالجة الفيديو بنجاح عبر السيرفر!',
+            outputPath: outputPath
         });
+    });
 });
 
-app.get('/', (req, res) => {
-    res.send('NIGHTFALL Server is Running & Ready!');
-});
-
+const PORT = process.0 || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`سيرفر المعالجة يعمل بكفاءة على المنفذ ${PORT}`);
 });
