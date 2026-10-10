@@ -1,44 +1,46 @@
 const express = require('express');
-const cors = require('cors');
+const multer = require('multer');
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
+
 const app = express();
+const upload = multer({ dest: 'uploads/' });
 
+app.use(express.static('public'));
 app.use(express.json());
-app.use(cors());
 
-// قائمة الأكواد الصحيحة المسموح لها بالتفعيل (يمكنك تعديلها أو إضافتها)
-const VALID_KEYS = [
-    "NIGHTFALL-VIP-2026",
-    "VIP-ADMIN-KEY",
-    "FREE-PASS-123"
-];
-
-// نقطة لفحص حالة السيرفر
-app.get('/', (req, res) => {
-    res.json({ status: "Server is running perfectly!", version: "3.1.5-Nightfall" });
-});
-
-// نقطة التحقق من التفعيل
-app.post('/api/check-auth', (req, res) => {
-    const { key } = req.body;
-    if (key && VALID_KEYS.includes(key.trim())) {
-        return res.json({ authorized: true, plan: "premium", unlimited: true });
+app.post('/api/process-video', upload.single('video'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'لم يتم رفع أي فيديو' });
     }
-    return res.json({ authorized: false, message: "الكود غير صحيح أو منتهي." });
-});
 
-// نقطة تفعيل الكود الجديد
-app.post('/api/activate', (req, res) => {
-    const { key } = req.body;
-    if (key && VALID_KEYS.includes(key.trim())) {
-        return res.json({ 
-            success: true, 
-            message: "تم التفعيل بنجاح عبر السيرفر! المحاولات أصبحت غير محدودة." 
+    const inputPath = req.file.path;
+    const outputPath = path.join('uploads', `output_${Date.now()}.mp4`);
+
+    // أمر FFmpeg الدقيق لمنع تيك توك من إعادة الضغط وتخريب الجودة
+    const ffmpegCommand = `ffmpeg -i "${inputPath}" -c:v libx264 -preset slow -crf 18 -r 60 -pix_fmt yuv420p -c:a aac "${outputPath}"`;
+
+    console.log('[SYSTEM] Processing video on Render server...');
+
+    exec(ffmpegCommand, (error, stdout, stderr) => {
+        if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+
+        if (error) {
+            console.error(`[ERROR] ${error.message}`);
+            return res.status(500).json({ error: 'فشل في معالجة الفيديو' });
+        }
+
+        console.log('[SUCCESS] Video processed successfully!');
+        
+        res.download(outputPath, 'NIGHTFALL_PROTECTED_VIDEO.mp4', (err) => {
+            if (err) console.error(err);
+            if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
         });
-    }
-    return res.json({ success: false, message: "الكود غير صحيح." });
+    });
 });
 
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`[SERVER] Nightfall running on port ${PORT}`);
 });
