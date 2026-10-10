@@ -1,7 +1,6 @@
 {
   "name": "nightfall-desktop",
   "version": "1.0.0",
-  "description": "NIGHTFALL Desktop App",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
