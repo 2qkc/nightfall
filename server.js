@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // زيادة مهلة السيرفر لتبقى مفتوحة لمدة 10 دقائق كاملة للمعالجة الثقيلة
-app.setTimeout(600000); 
+ 
 
 const uploadDir = path.join(__dirname, 'uploads');
 const outputDir = path.join(__dirname, 'downloads');
