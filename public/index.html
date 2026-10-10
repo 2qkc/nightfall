@@ -3,419 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIGHTFALL | Ultimate Suite</title>
+    <title>Nightfall - TikTok High Quality Uploader</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            background-color: #050508;
-            color: #f0f0f5;
-            min-height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-            padding: 20px;
-            gap: 20px;
-        }
-
-        .sidebar {
-            width: 260px;
-            background: #0a0a12;
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .logo-area {
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: #fff;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .logo-area span {
-            color: #ff007f;
-        }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            flex-grow: 1;
-        }
-
-        .nav-links li {
-            padding: 12px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #8c8c9e;
-            transition: 0.3s;
-        }
-
-        .nav-links li:hover, .nav-links li.active {
-            background: rgba(157, 78, 221, 0.2);
-            color: #fff;
-            border: 1px solid #9d4edd;
-        }
-
-        .server-badge {
-            background: rgba(255, 0, 127, 0.1);
-            border: 1px solid #ff007f;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: #ff007f;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            background: #0a0a12;
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            padding: 30px;
-            overflow-y: auto;
-        }
-
-        .tab-content {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-            height: 100%;
-        }
-
-        .tab-content.active {
-            display: flex;
-        }
-
-        h2 {
-            font-size: 20px;
-            margin-bottom: 5px;
-            color: #9d4edd;
-        }
-
-        .drop-zone {
-            border: 2px dashed #9d4edd;
-            border-radius: 12px;
-            padding: 25px;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            background: rgba(157, 78, 221, 0.05);
-            cursor: pointer;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
             text-align: center;
-            transition: 0.3s;
+            background: #161b22;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            width: 400px;
+            border: 1px solid #30363d;
         }
-
-        .drop-zone:hover {
-            background: rgba(157, 78, 221, 0.12);
-            border-color: #ff007f;
+        h1 {
+            color: #58a6ff;
+            font-size: 24px;
+            margin-bottom: 10px;
         }
-
-        .stats-box {
-            background: #020204;
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        p {
+            color: #8b949e;
             font-size: 14px;
+            margin-bottom: 25px;
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .stat-item span {
-            color: #ff007f;
-            font-weight: bold;
-        }
-
-        .patch-glow-banner {
-            width: 100%;
-            text-align: center;
-            padding: 10px;
-            background: rgba(157, 78, 221, 0.15);
-            border: 1px solid #9d4edd;
-            border-radius: 6px;
-            color: #b5179e;
-            font-weight: 900;
-            font-size: 15px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px #b5179e, 0 0 20px #7209b7;
-        }
-
-        .actions-box {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .cyber-btn {
-            flex: 1;
-            background: linear-gradient(135deg, #9d4edd, #ff007f);
+        .btn {
+            background-color: #238636;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
             font-weight: bold;
+            border-radius: 6px;
             cursor: pointer;
-            text-transform: uppercase;
-            font-size: 13px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            transition: 0.2s;
+            width: 100%;
+            transition: background 0.2s;
         }
-
-        .cyber-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
+        .btn:hover {
+            background-color: #2ea043;
         }
-
-        .cyber-btn:disabled {
-            background: #333;
+        .btn:disabled {
+            background-color: #484f58;
             cursor: not-allowed;
-            opacity: 0.6;
         }
-
-        .cyber-btn-secondary {
-            background: #050508;
-            border: 1px solid #9d4edd;
-            color: #00ffcc;
-        }
-
-        .console-box {
-            background: #020204;
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            font-family: monospace;
-            font-size: 12px;
-            color: #00ffcc;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .setting-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            padding: 15px;
-            border-radius: 8px;
+        #statusText {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #f0883e;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+    <div class="container">
+        <h1>NIGHTFALL UPLOADER</h1>
+        <p>نظام ضغط ومعالجة الفيديوهات لرفعها بجودة خيالية على تيك توك بدون VPN</p>
         
-        <!-- القائمة الجانبية -->
-        <div class="sidebar">
-            <div class="logo-area">NIGHT<span>FALL</span></div>
-            
-            <ul class="nav-links">
-                <li class="active" onclick="switchTab('home', event)">الرئيسية (HUD & Patch)</li>
-                <li onclick="switchTab('console', event)">وحدة التحكم</li>
-                <li onclick="switchTab('settings', event)">حماية وتخطى تيك توك</li>
-                <li onclick="switchTab('account', event)">الحساب والمصادقة</li>
-            </ul>
-
-            <div class="server-badge">SERVER: FAST-OPTIMIZE</div>
-        </div>
-
-        <!-- المحتوى الرئيسي -->
-        <div class="main-content">
-            
-            <!-- الرئيسية -->
-            <div id="home" class="tab-content active">
-                <h2>نظام معالجة وتثبيت جودة تيك توك</h2>
-                <p style="color: #8c8c9e;">اختر مقطع الفيديو لتجهيزه وضغطه بالبصمة المثالية التي تمنع سيرفرات تيك توك من خفض دقته.</p>
-                
-                <input type="file" id="realFilePicker" style="display: none;" accept="video/*" onchange="processVideoFile(event)">
-
-                <div class="drop-zone" onclick="document.getElementById('realFilePicker').click()">
-                    <div id="dropZoneText">
-                        <p style="color: #00ffcc; font-size: 15px; font-weight: bold;">📁 انقر هنا لاختيار المقطع (استجابة فورية بدون تعليق)</p>
-                        <p style="color: #8c8c9e; font-size: 12px; margin-top: 4px;">يدعم دقة 2K / 4K ومعدل 120 FPS</p>
-                    </div>
-                </div>
-
-                <div class="stats-box" id="videoStatsBox" style="display: none;">
-                    <div class="stats-grid">
-                        <div class="stat-item">اسم الملف: <span id="vName">---</span></div>
-                        <div class="stat-item">الدقة: <span id="vRes">---</span></div>
-                        <div class="stat-item">الحجم: <span id="vSize">0 MB</span></div>
-                        <div class="stat-item">الإطارات: <span id="vFps">---</span></div>
-                    </div>
-                    
-                    <div class="patch-glow-banner" id="patchBanner">
-                        ⚡ ANTI-COMPRESSION PROFILE READY ⚡
-                    </div>
-
-                    <div class="actions-box" id="actionButtons">
-                        <button class="cyber-btn" id="downloadBtn" onclick="downloadOptimizedVideo()">📥 حفظ المقطع المضغوط والمحمي</button>
-                        <a href="https://www.tiktok.com/tiktokstudio/upload" target="_blank" class="cyber-btn cyber-btn-secondary">🚀 فتح استوديو تيك توك</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- وحدة التحكم -->
-            <div id="console" class="tab-content">
-                <h2>سجل النظام</h2>
-                <div class="console-box" id="consoleLogs">
-                    [SYSTEM] NIGHTFALL Fast Suite online.<br>
-                    [ENGINE] Zero-Lag optimization wrapper loaded.<br>
-                    [READY] Awaiting video selection...
-                </div>
-            </div>
-
-            <!-- الإعدادات -->
-            <div id="settings" class="tab-content">
-                <h2>إعدادات التخطي</h2>
-                <div class="setting-card">
-                    <h3 style="color: #9d4edd; margin-bottom: 5px;">بروتوكول ترويسة الحاوية الذكية</h3>
-                    <p style="color: #8c8c9e; font-size: 13px;">تعديل الهيكل الثنائي لضمان قبول السيرفر للملف بدقة عالية.</p>
-                </div>
-            </div>
-
-            <!-- الحساب -->
-            <div id="account" class="tab-content">
-                <h2>معلومات الترخيص</h2>
-                <div class="setting-card">
-                    <h3 style="color: #9d4edd; margin-bottom: 5px;">VIP ELITE</h3>
-                    <p style="color: #8c8c9e; font-size: 13px;">مرخص ومفعل بالكامل.</p>
-                </div>
-            </div>
-
-        </div>
+        <input type="file" id="videoFile" accept="video/*" style="display: none;">
+        <button class="btn" id="processBtn">اختر الفيديو وابدأ المعالجة 🚀</button>
+        
+        <div id="statusText">جاهز للعمل...</div>
     </div>
 
     <script>
-        let currentFile = null;
+        const { ipcRenderer } = require('electron');
 
-        function switchTab(tabId, event) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+        const processBtn = document.getElementById('processBtn');
+        const videoFileInput = document.getElementById('videoFile');
+        const statusText = document.getElementById('statusText');
 
-            document.getElementById(tabId).classList.add('active');
-            if(event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
-            }
-        }
+        processBtn.addEventListener('click', () => {
+            videoFileInput.click();
+        });
 
-        function processVideoFile(event) {
+        videoFileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
-            currentFile = file;
 
-            document.getElementById('dropZoneText').innerHTML = `
-                <p style="color: #00ffcc; font-size: 14px; font-weight: bold;">✅ تم اختيار الملف بنجاح: ${file.name}</p>
-            `;
-
-            document.getElementById('videoStatsBox').style.display = 'flex';
-
-            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-            document.getElementById('vName').innerText = file.name;
-            document.getElementById('vSize').innerText = `${fileSizeMB} MB`;
-
-            const videoElement = document.createElement('video');
-            videoElement.preload = 'metadata';
-            
-            videoElement.onloadedmetadata = function() {
-                window.URL.revokeObjectURL(videoElement.src);
-                const width = videoElement.videoWidth;
-                const height = videoElement.videoHeight;
-                document.getElementById('vRes').innerText = `${width}x${height} (Pixels)`;
-
-                let fpsText = "60 FPS (جاهز ومحمي)";
-                if (width >= 2560 || height >= 1440) {
-                    fpsText = "120 FPS / 2K (جاهز ومحمي)";
-                } else if (width >= 3840) {
-                    fpsText = "120 FPS / 4K (جاهز ومحمي)";
-                }
-                document.getElementById('vFps').innerText = fpsText;
-                logToConsole(`[SUCCESS] File loaded: ${file.name} | Res: ${width}x${height}`);
-            };
-
-            videoElement.src = URL.createObjectURL(file);
-        }
-
-        async function downloadOptimizedVideo() {
-            if (!currentFile) return;
-
-            const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.disabled = true;
-            downloadBtn.innerText = "⏳ جاري المعالجة والرندر الحقيقي (انتظر قليلاً)...";
-            
-            logToConsole(`[EXPORT] Sending video to Render server for real anti-compression processing...`);
-
-            const formData = new FormData();
-            formData.append('video', currentFile);
+            const inputPath = file.path; // مسار الملف الحقيقي على الجهاز
 
             try {
-                // إرسال الملف الفعلي إلى سيرفر Render والانتظار حتى ينتهي الرندر
-                const response = await fetch('https://nightfall-tiktokupload.onrender.com/process', {
-                    method: 'POST',
-                    body: formData
-                });
+                processBtn.disabled = true;
+                statusText.textContent = 'جاري ضغط ومعالجة الفيديو بالترميز الخارق... ⏳';
 
-                if (!response.ok) {
-                    throw new Error('فشل السيرفر في معالجة الفيديو');
+                // إرسال المسار للـ main.js لتتم المعالجة عبر FFmpeg
+                const outputPath = await ipcRenderer.invoke('process-video-local', inputPath);
+
+                if (outputPath) {
+                    statusText.textContent = 'تمت المعالجة وحفظ المقطع في مجلد التنزيلات بنجاح! 🎉';
+                    
+                    // فتح استوديو تيك توك تلقائياً لتعمل إضافة TikoSystem وتستلم المقطع
+                    setTimeout(() => {
+                        window.open('https://www.tiktok.com/tiktokstudio/upload', '_blank');
+                    }, 1500);
                 }
-
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `NIGHTFALL_PROTECTED_${currentFile.name}`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                logToConsole(`[SUCCESS] Render complete! Protected file downloaded successfully.`);
             } catch (error) {
-                logToConsole(`[ERROR] Server processing failed: ${error.message}`);
-                alert('حدث خطأ أثناء معالجة الفيديو على السيرفر. تأكد أن السيرفر مستيقظ وشغال.');
+                console.error(error);
+                statusText.textContent = 'حدث خطأ أثناء المعالجة: ' + error;
             } finally {
-                downloadBtn.disabled = false;
-                downloadBtn.innerText = "📥 حفظ المقطع المضغوط والمحمي";
+                processBtn.disabled = false;
             }
-        }
-
-        function logToConsole(message) {
-            const consoleBox = document.getElementById('consoleLogs');
-            if(consoleBox) {
-                const timestamp = new Date().toLocaleTimeString();
-                consoleBox.innerHTML += `<br>[${timestamp}] ${message}`;
-                consoleBox.scrollTop = consoleBox.scrollHeight;
-            }
-        }
+        });
     </script>
 </body>
 </html>
