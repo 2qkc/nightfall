@@ -1,51 +1,27 @@
-const express = require('express');
-const multer = require('multer');
-const { exec } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const ffmpeg = require('fluent-ffmpeg');
 
-const app = express();
-
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const upload = multer({ dest: uploadDir });
-
-// قراءة الواجهة الأصلية من مجلد public
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// مسار معالجة الفيديو بالسرعة القصوى
-app.post('/api/process-video', upload.single('video'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'لم يتم رفع أي فيديو' });
-    }
-
+// دالة المعالجة الحقيقية للفيديو
+app.post('/process-video', (req, res) => {
     const inputPath = req.file.path;
-    const outputPath = path.join(uploadDir, `output_${Date.now()}.mp4`);
+    const outputPath = `outputs/processed_${Date.now()}.mp4`;
 
-    const ffmpegCommand = `ffmpeg -i "${inputPath}" -c:v libx264 -preset slow -crf 18 -r 60 -pix_fmt yuv420p -c:a aac "${outputPath}"`;
-
-    exec(ffmpegCommand, (error, stdout, stderr) => {
-        if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
-
-        if (error) {
-            return res.status(500).json({ error: 'فشل في معالجة الفيديو' });
-        }
-        
-        res.download(outputPath, 'NIGHTFALL_PRO_FINAL.mp4', (err) => {
-            if (err) console.error(err);
-            if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+    ffmpeg(inputPath)
+        // الحفاظ على أقصى جودة ورفع Bitrate
+        .videoCodec('libx264')
+        .outputOptions([
+            '-crf 18',                  // جودة عالية جداً بدون ضغط ملحوظ
+            '-preset slow',              // معالجة بطيئة لضمان أفضل جودة وحجم
+            '-pix_fmt yuv420p',
+            '-movflags +faststart',
+            '-metadata title="NightFall Ultra 4K"' // تعديل الميتا داتا
+        ])
+        .save(outputPath)
+        .on('end', () => {
+            // إرسال الملف المعالج الحقيقي بعد انتهاء الرندر
+            res.download(outputPath);
+        })
+        .on('error', (err) => {
+            console.error('Render Error:', err);
+            res.status(500).send('فشل الرندر');
         });
-    });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`[SERVER] Nightfall running on port ${PORT}`);
 });
