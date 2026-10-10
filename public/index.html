@@ -197,6 +197,12 @@
             transform: translateY(-1px);
         }
 
+        .cyber-btn:disabled {
+            background: #333;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .cyber-btn-secondary {
             background: #050508;
             border: 1px solid #9d4edd;
@@ -238,7 +244,7 @@
                 <li onclick="switchTab('account', event)">الحساب والمصادقة</li>
             </ul>
 
-            <div class="server-badge">SERVER: STABLE ULTRA</div>
+            <div class="server-badge">SERVER: FAST-OPTIMIZE</div>
         </div>
 
         <!-- المحتوى الرئيسي -->
@@ -246,15 +252,15 @@
             
             <!-- الرئيسية -->
             <div id="home" class="tab-content active">
-                <h2>معالجة الوسائط وتخطي ضغط تيك توك</h2>
-                <p style="color: #8c8c9e;">اختر المقطع لتطبيق حزمة الضغط والترميز المضادة لخوارزميات تيك توك فوراً وبدون أي تعليق.</p>
+                <h2>نظام معالجة وتثبيت جودة تيك توك</h2>
+                <p style="color: #8c8c9e;">اختر مقطع الفيديو لتجهيزه وضغطه بالبصمة المثالية التي تمنع سيرفرات تيك توك من خفض دقته.</p>
                 
                 <input type="file" id="realFilePicker" style="display: none;" accept="video/*" onchange="processVideoFile(event)">
 
                 <div class="drop-zone" onclick="document.getElementById('realFilePicker').click()">
                     <div id="dropZoneText">
-                        <p style="color: #00ffcc; font-size: 15px; font-weight: bold;">📁 انقر هنا لاختيار مقطع الفيديو (سريع وخفيف)</p>
-                        <p style="color: #8c8c9e; font-size: 12px; margin-top: 4px;">يدعم جميع الاحجام والدقة العالية (2K / 4K)</p>
+                        <p style="color: #00ffcc; font-size: 15px; font-weight: bold;">📁 انقر هنا لاختيار المقطع (استجابة فورية بدون تعليق)</p>
+                        <p style="color: #8c8c9e; font-size: 12px; margin-top: 4px;">يدعم دقة 2K / 4K ومعدل 120 FPS</p>
                     </div>
                 </div>
 
@@ -267,7 +273,7 @@
                     </div>
                     
                     <div class="patch-glow-banner" id="patchBanner">
-                        ⚡ ULTRA ANTI-COMPRESSION LOCKED ⚡
+                        ⚡ ANTI-COMPRESSION PROFILE READY ⚡
                     </div>
 
                     <div class="actions-box" id="actionButtons">
@@ -281,8 +287,8 @@
             <div id="console" class="tab-content">
                 <h2>سجل النظام</h2>
                 <div class="console-box" id="consoleLogs">
-                    [SYSTEM] NIGHTFALL Stable Suite online.<br>
-                    [ENGINE] Zero-Lag compression wrapper loaded.<br>
+                    [SYSTEM] NIGHTFALL Fast Suite online.<br>
+                    [ENGINE] Zero-Lag optimization wrapper loaded.<br>
                     [READY] Awaiting video selection...
                 </div>
             </div>
@@ -291,8 +297,8 @@
             <div id="settings" class="tab-content">
                 <h2>إعدادات التخطي</h2>
                 <div class="setting-card">
-                    <h3 style="color: #9d4edd; margin-bottom: 5px;">بروتوكول البتريت الذكي (Smart Bitrate Wrapper)</h3>
-                    <p style="color: #8c8c9e; font-size: 13px;">تعديل بنية الملف ليظهر للسيرفر كفيديو معالج مسبقاً.</p>
+                    <h3 style="color: #9d4edd; margin-bottom: 5px;">بروتوكول ترويسة الحاوية الذكية</h3>
+                    <p style="color: #8c8c9e; font-size: 13px;">تعديل الهيكل الثنائي لضمان قبول السيرفر للملف بدقة عالية.</p>
                 </div>
             </div>
 
@@ -345,36 +351,61 @@
                 const height = videoElement.videoHeight;
                 document.getElementById('vRes').innerText = `${width}x${height} (Pixels)`;
 
-                let fpsText = "60 FPS (مضغوط ومحمي)";
+                let fpsText = "60 FPS (جاهز ومحمي)";
                 if (width >= 2560 || height >= 1440) {
-                    fpsText = "120 FPS / 2K (مضغوط ومحمي)";
+                    fpsText = "120 FPS / 2K (جاهز ومحمي)";
                 } else if (width >= 3840) {
-                    fpsText = "120 FPS / 4K (مضغوط ومحمي)";
+                    fpsText = "120 FPS / 4K (جاهز ومحمي)";
                 }
                 document.getElementById('vFps').innerText = fpsText;
-                logToConsole(`[SUCCESS] File loaded & optimized: ${file.name} | Res: ${width}x${height}`);
+                logToConsole(`[SUCCESS] File loaded: ${file.name} | Res: ${width}x${height}`);
             };
 
             videoElement.src = URL.createObjectURL(file);
         }
 
-        function downloadOptimizedVideo() {
+        async function downloadOptimizedVideo() {
             if (!currentFile) return;
-            logToConsole(`[EXPORT] Packaging optimized file with anti-compression headers...`);
 
-            // إنشاء ملف معدل بخصائص تمنع إعادة الضغط وتسمح برفعه بسلاسة
-            const optimizedBlob = new Blob([currentFile], { type: 'video/mp4' });
-            const url = URL.createObjectURL(optimizedBlob);
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.disabled = true;
+            downloadBtn.innerText = "⏳ جاري المعالجة والرندر الحقيقي (انتظر قليلاً)...";
             
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `NIGHTFALL_OPTIMIZED_2K_${currentFile.name}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            logToConsole(`[EXPORT] Sending video to Render server for real anti-compression processing...`);
 
-            logToConsole(`[READY] File downloaded. Ready to upload to TikTok Studio!`);
+            const formData = new FormData();
+            formData.append('video', currentFile);
+
+            try {
+                // إرسال الملف الفعلي إلى سيرفر Render والانتظار حتى ينتهي الرندر
+                const response = await fetch('https://nightfall-tiktokupload.onrender.com/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('فشل السيرفر في معالجة الفيديو');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `NIGHTFALL_PROTECTED_${currentFile.name}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                logToConsole(`[SUCCESS] Render complete! Protected file downloaded successfully.`);
+            } catch (error) {
+                logToConsole(`[ERROR] Server processing failed: ${error.message}`);
+                alert('حدث خطأ أثناء معالجة الفيديو على السيرفر. تأكد أن السيرفر مستيقظ وشغال.');
+            } finally {
+                downloadBtn.disabled = false;
+                downloadBtn.innerText = "📥 حفظ المقطع المضغوط والمحمي";
+            }
         }
 
         function logToConsole(message) {
