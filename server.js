@@ -21,10 +21,10 @@ app.get('/', (req, res) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>TIKOPRO - Nightfall Studio</title>
+            <title>Nightfall - TikoPro Studio</title>
             <style>
                 body {
-                    font-family: 'Segoe UI', Tahoma, sans-serif;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     background-color: #0b0714;
                     color: #fff;
                     margin: 0;
@@ -36,27 +36,20 @@ app.get('/', (req, res) => {
                 .studio-card {
                     background: #130e24;
                     border: 1px solid #2b1b4d;
-                    width: 450px;
-                    padding: 30px;
+                    width: 500px;
+                    padding: 40px;
                     border-radius: 16px;
-                    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
+                    box-shadow: 0 10px 40px rgba(138, 43, 226, 0.25);
                     text-align: center;
                 }
-                h2 {
-                    color: #c084fc;
-                    margin-bottom: 10px;
-                    letter-spacing: 1px;
-                }
-                p {
-                    color: #9ca3af;
-                    font-size: 14px;
-                    margin-bottom: 25px;
+                .upload-section {
+                    display: block;
                 }
                 .upload-box {
                     border: 2px dashed #4c1d95;
-                    padding: 30px;
-                    border-radius: 12px;
                     background: #18102e;
+                    padding: 40px 20px;
+                    border-radius: 12px;
                     cursor: pointer;
                     transition: 0.3s;
                 }
@@ -64,130 +57,147 @@ app.get('/', (req, res) => {
                     border-color: #a855f7;
                     background: #1f143a;
                 }
-                input[type="file"] {
-                    display: none;
-                }
-                .file-label {
-                    color: #e9d5ff;
-                    font-weight: bold;
-                    cursor: pointer;
-                }
-                .btn-process {
+                .btn-select {
                     background: linear-gradient(135deg, #7e22ce, #a855f7);
                     color: white;
                     border: none;
-                    padding: 12px 20px;
+                    padding: 12px 30px;
                     font-size: 16px;
+                    font-weight: bold;
                     border-radius: 8px;
                     cursor: pointer;
-                    width: 100%;
-                    font-weight: bold;
-                    margin-top: 20px;
-                    transition: 0.3s;
-                }
-                .btn-process:hover {
-                    opacity: 0.9;
-                    box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
-                }
-                #progress-container {
-                    display: none;
-                    margin-top: 20px;
-                }
-                .progress-bar-bg {
-                    background: #2b1b4d;
-                    border-radius: 10px;
-                    overflow: hidden;
-                    height: 10px;
-                    width: 100%;
-                    margin-top: 10px;
-                }
-                .progress-bar-fill {
-                    background: linear-gradient(90deg, #9333ea, #c084fc);
-                    height: 100%;
-                    width: 0%;
-                    transition: width 0.4s ease;
-                }
-                #status {
                     margin-top: 15px;
+                }
+                input[type="file"] {
+                    display: none;
+                }
+                /* تصميم الدائرة والعداد المشابه لـ TikoPro */
+                #progress-section {
+                    display: none;
+                }
+                .circular-progress {
+                    position: relative;
+                    width: 150px;
+                    height: 150px;
+                    margin: 20px auto;
+                    border-radius: 50%;
+                    background: conic-gradient(#c084fc 0deg, #2b1b4d 0deg);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .circular-inner {
+                    width: 120px;
+                    height: 120px;
+                    background: #130e24;
+                    border-radius: 50%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .percentage {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #fff;
+                }
+                .brand-name {
+                    font-size: 11px;
+                    color: #a855f7;
+                    letter-spacing: 1px;
+                    margin-top: 2px;
+                }
+                #status-desc {
                     color: #d8b4fe;
                     font-size: 14px;
+                    margin-top: 15px;
                     font-weight: bold;
                 }
             </style>
         </head>
         <body>
             <div class="studio-card">
-                <h2>TIKO-PRO STUDIO</h2>
-                <p>ارفع مقطعك لمعالجته بالمعايير الخارقة المضادة للضغط وبجودة عالية</p>
-                
-                <div class="upload-box" onclick="document.getElementById('videoFile').click();">
-                    <span class="file-label" id="fileName">اضغط هنا لاختيار الفيديو 🎥</span>
-                    <input type="file" id="videoFile" accept="video/*" onchange="showFileName()">
+                <div class="upload-section" id="uploadSec">
+                    <h2 style="color: #c084fc; margin-top: 0;">NIGHTFALL STUDIO</h2>
+                    <p style="color: #9ca3af; font-size: 14px; margin-bottom: 25px;">ارفع مقطعك ليقوم السيرفر برندره وضغطه بجودة خارقة</p>
+                    <div class="upload-box" onclick="document.getElementById('videoFile').click();">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <h3 id="fileNameDisplay" style="margin: 10px 0 5px; color: #fff;">حدد الفيديو لرفع ومعالجة السيرفر</h3>
+                        <button class="btn-select">اختيار فيديو</button>
+                        <input type="file" id="videoFile" accept="video/*" onchange="startProcessing()">
+                    </div>
                 </div>
 
-                <button class="btn-process" onclick="uploadVideo()">بدء معالجة ورندر الفيديو ⚡</button>
-
-                <div id="progress-container">
-                    <div id="status">جاري رفع ومعالجة الفيديو للسيرفر... 0%</div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" id="progressBar"></div>
+                <div id="progress-section">
+                    <h3 style="color: #c084fc; margin-top: 0;">NIGHTFALL RENDER</h3>
+                    <div class="circular-progress" id="circleProgress">
+                        <div class="circular-inner">
+                            <div class="percentage" id="percentText">0%</div>
+                            <div class="brand-name">TIKOPRO</div>
+                        </div>
                     </div>
+                    <div id="status-desc">جاري الاتصال بسيرفر المعالجة...</div>
                 </div>
             </div>
 
             <script>
-                function showFileName() {
+                function startProcessing() {
                     const fileInput = document.getElementById('videoFile');
-                    if (fileInput.files.length > 0) {
-                        document.getElementById('fileName').innerText = "تم اختيار: " + fileInput.files[0].name;
-                    }
-                }
+                    if (fileInput.files.length === 0) return;
 
-                async function uploadVideo() {
-                    const fileInput = document.getElementById('videoFile');
-                    const progressContainer = document.getElementById('progress-container');
-                    const statusDiv = document.getElementById('status');
-                    const progressBar = document.getElementById('progressBar');
-                    
-                    if (fileInput.files.length === 0) {
-                        alert('الرجاء اختيار فيديو أولاً!');
-                        return;
-                    }
+                    document.getElementById('uploadSec').style.display = 'none';
+                    document.getElementById('progress-section').style.display = 'block';
+
+                    let progress = 0;
+                    const percentText = document.getElementById('percentText');
+                    const circleProgress = document.getElementById('circleProgress');
+                    const statusDesc = document.getElementById('status-desc');
+
+                    // محاكاة تصاعد العداد الدائري الاحترافي أثناء رندر السيرفر
+                    const interval = setInterval(() => {
+                        if (progress < 85) {
+                            progress += Math.floor(Math.random() * 5) + 2;
+                            percentText.innerText = progress + '%';
+                            circleProgress.style.background = \`conic-gradient(#c084fc \${progress * 3.6}deg, #2b1b4d 0deg)\`;
+                            
+                            if (progress > 30 && progress < 60) {
+                                statusDesc.innerText = 'جاري ضغط الفيديو بدقة HD و 60 FPS... ⚙️';
+                            } else if (progress >= 60) {
+                                statusDesc.innerText = 'جاري إعداد الملف المضاد للضغط من تيك توك... 🚀';
+                            }
+                        }
+                    }, 300);
 
                     const formData = new FormData();
                     formData.append('video', fileInput.files[0]);
 
-                    progressContainer.style.display = 'block';
-                    statusDiv.innerHTML = 'جاري الرفع لسيرفر Render المعالج... 🚀';
-                    progressBar.style.width = '30%';
-
-                    try {
-                        setTimeout(() => {
-                            statusDiv.innerHTML = 'جاري رندر الفيديو بدقة HD و 60 FPS... ⚙️';
-                            progressBar.style.width = '70%';
-                        }, 2000);
-
-                        const response = await fetch('/api/process-video', {
-                            method: 'POST',
-                            body: formData
-                        });
-
+                    fetch('/api/process-video', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
                         if (!response.ok) throw new Error('فشل المعالجة');
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        clearInterval(interval);
+                        progress = 100;
+                        percentText.innerText = '100%';
+                        circleProgress.style.background = 'conic-gradient(#c084fc 360deg, #2b1b4d 0deg)';
+                        statusDesc.innerText = 'تم الانتهاء بنجاح! جاري تحميل ملفك الخارق... ✅';
 
-                        progressBar.style.width = '100%';
-                        statusDiv.innerHTML = 'تم الانتهاء بنجاح! جاري تحميل ملفك الخارق... ✅';
-
-                        const blob = await response.blob();
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = 'TIKOPRO_PROTECTED_VIDEO.mp4';
+                        a.download = 'NIGHTFALL_RENDERED_HD.mp4';
                         document.body.appendChild(a);
                         a.click();
                         a.remove();
-                    } catch (error) {
-                        statusDiv.innerHTML = 'حدث خطأ أثناء المعالجة ❌';
-                    }
+                    })
+                    .catch(error => {
+                        clearInterval(interval);
+                        statusDesc.innerText = 'حدث خطأ أثناء المعالجة ❌';
+                    });
                 }
             </script>
         </body>
@@ -217,7 +227,7 @@ app.post('/api/process-video', upload.single('video'), (req, res) => {
 
         console.log('[SUCCESS] Video processed successfully!');
         
-        res.download(outputPath, 'TIKOPRO_PROTECTED_VIDEO.mp4', (err) => {
+        res.download(outputPath, 'NIGHTFALL_RENDERED_HD.mp4', (err) => {
             if (err) console.error(err);
             if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
         });
@@ -226,5 +236,5 @@ app.post('/api/process-video', upload.single('video'), (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`[SERVER] TikoPro Studio running on port ${PORT}`);
+    console.log(`[SERVER] TikoPro Studio Clone running on port ${PORT}`);
 });
