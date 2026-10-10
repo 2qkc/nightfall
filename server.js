@@ -7,7 +7,9 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// إعداد مسارات التخزين المؤقت
+// زيادة مهلة السيرفر لتبقى مفتوحة لمدة 10 دقائق كاملة للمعالجة الثقيلة
+app.setTimeout(600000); 
+
 const uploadDir = path.join(__dirname, 'uploads');
 const outputDir = path.join(__dirname, 'downloads');
 
@@ -18,40 +20,40 @@ const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
 });
-const upload = multer({ storage });
 
-// تفعيل قراءة الـ static files لعرض واجهة index.html
-app.use(express.static(path.join(__dirname, 'public')));
-// الصفحة الرئيسية تعرض الواجهة الفخمة مباشرة
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// رفع الحد الأقصى لحجم الملف إلى 500 ميجابايت
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 500 * 1024 * 1024 } 
 });
 
-// مسار معالجة الفيديو القادم من الواجهة
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.post('/process-video', upload.single('video'), (req, res) => {
     if (!req.file) {
-        return res.status(400).send('لم يتم إرسال أي فيديو للمعالجة.');
+        return res.status(400).send('لم يتم إرسال أي فيديو أو أن حجمه أكبر من المسموح.');
     }
 
     const inputPath = req.file.path;
     const outputFileName = `NIGHTFALL_PROTECTED_${Date.now()}.mp4`;
     const outputPath = path.join(outputDir, outputFileName);
 
-    // أمر الـ FFmpeg المضبوط لتجاوز ضغط تيك توك وتثبيت الـ 60 FPS وإزالة البصمات
-    const ffmpegCommand = `ffmpeg -i "${inputPath}" -c:v libx264 -profile:v high -level 4.1 -crf 18 -preset medium -pix_fmt yuv420p -r 60 -g 120 -b:v 6M -b:a 192k -map_metadata -1 -movflags +faststart "${outputPath}"`;
+    // أمر FFmpeg السريع والمحسن لضغط الفيديوهات الكبيرة بدون انهيار الذاكرة
+    const ffmpegCommand = `ffmpeg -i "${inputPath}" -c:v libx264 -profile:v high -level 4.1 -crf 20 -preset fast -pix_fmt yuv420p -r 60 -g 120 -b:v 5M -b:a 192k -map_metadata -1 -movflags +faststart "${outputPath}"`;
 
-    exec(ffmpegCommand, (error, stdout, stderr) => {
-        // حذف الملف الأصلي المرفوع فوراً لتوفير مساحة السيرفر
+    exec(ffmpegCommand, { maxBuffer: 1024 * 1024 * 50 }, (error, stdout, stderr) => {
         if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
 
         if (error) {
             console.error(`خطأ FFmpeg: ${error.message}`);
-            return res.status(500).send('فشلت معالجة الفيديو داخل السيرفر.');
+            return res.status(500).send('فشلت المعالجة بسبب ضغط الملف.');
         }
 
-        // إرسال الملف المعالج مباشرة للمتصفح للتحميل
         res.download(outputPath, outputFileName, (err) => {
-            // حذف الملف المعالج بعد إرساله للمستخدم لتنظيف السيرفر
             setTimeout(() => {
                 if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
             }, 10000);
