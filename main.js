@@ -21,27 +21,28 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-// الخدعة الجذرية (Fake Encoding / Metadata Spoofing) لتجاوز ضغط تيك توك
+// ترميز الخداع المتقدم لتجاوز الفحص المتكرر وإلغاء الضغط الثاني
 ipcMain.handle('process-video-local', async (event, inputPath) => {
     return new Promise((resolve, reject) => {
-        const outputFileName = `NIGHTFALL_FAKED_${Date.now()}.mp4`;
+        const outputFileName = `NIGHTFALL_STEALTH_${Date.now()}.mp4`;
         const outputPath = path.join(app.getPath('downloads'), outputFileName);
 
         ffmpeg(inputPath)
             .videoCodec('libx264')
             .audioCodec('aac')
             .outputOptions([
-                // إجبار التشفير على بروفايل High L4.2 مع خداع ترويسة العرض
                 '-profile:v high',
-                '-level 4.2',
-                '-crf 12',                          // جودة جنونية شبه خالية من الضغط
-                '-preset veryslow',                 // ضغط أقصى لإعادة صياغة البكسلات بالكامل
+                '-level 4.1',               // ليفل آمن جداً يتوافق مع كل الهواتف ولا يثير الشك
+                '-crf 15',                  // جودة حادة جداً
+                '-preset slow',
                 '-pix_fmt yuv420p',
-                '-maxrate 25M',                     // حجز سرعة نقل وهمية عالية جداً
-                '-bufsize 30M',
-                '-bsf:v h264_mp4toannexb',          // إعادة هيكلة الترويسة لتبدو كبث مباشر أو ملف مرجعي
-                '-metadata creator="NIGHTFALL_ENGINE"', // بصمة تضليل خوارزمية المنصة
-                '-movflags +faststart+use_metadata_tags'
+                '-r 60',                    // تثبيت الفريمات على 60 حصرياً لمنع إعادة المعالجة
+                '-g 120',                   // مفتاح الـ GOP لمنع الفحص الآلي من كشف التعديل
+                '-keyint_min 60',
+                '-b:v 10M',                 // معدل بث مثالي لا يستفز الخوارزمية ولا تضغطه
+                '-b:a 320k',
+                '-map_metadata -1',         // مسح كامل لأي بصمة برمجية أو أداة تعديل (خدعة الكاميرا الحقيقية)
+                '-movflags +faststart'
             ])
             .save(outputPath)
             .on('end', () => {
