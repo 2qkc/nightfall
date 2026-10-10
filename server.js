@@ -7,6 +7,17 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// رفع حد حجم البيانات المستقبلة (لتجنب رفض الملفات الكبيرة)
+app.use(express.json({ limit: '500mb' }));
+app.use(express.urlencoded({ limit: '500mb', extended: true }));
+
+// زيادة مهلة الاتصال للسيرفر لتتحمل وقت الرفع والمعالجة (10 دقائق)
+app.use((req, res, next) => {
+    req.setTimeout(600000);
+    res.setTimeout(600000);
+    next();
+});
+
 // التأكد من وجود مجلدات الحفظ
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 if (!fs.existsSync('outputs')) fs.mkdirSync('outputs');
@@ -39,7 +50,6 @@ app.post('/process-video', upload.single('video'), (req, res) => {
         .on('end', () => {
             console.log(`[SUCCESS] Processing finished: ${outputFileName}`);
             res.download(outputPath, outputFileName, (err) => {
-                // تنظيف الملفات بعد الإرسال
                 try {
                     fs.unlinkSync(inputPath);
                     fs.unlinkSync(outputPath);
