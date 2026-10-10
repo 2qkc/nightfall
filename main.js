@@ -1,3 +1,28 @@
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+
+// تعيين مسار الـ ffmpeg للتطبيق المحلي
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
+function createWindow() {
+    const mainWindow = new BrowserWindow({
+        width: 1200,
+        height: 750,
+        backgroundColor: '#000000',
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+
+    mainWindow.loadFile('index.html');
+}
+
+app.whenReady().then(createWindow);
+
+// معالجة الفيديو محلياً بأعلى جودة لتيك توك دون أن تخرب الجودة
 ipcMain.handle('process-video-local', async (event, inputPath) => {
     return new Promise((resolve, reject) => {
         const outputFileName = `NIGHTFALL_TIKTOK_${Date.now()}.mp4`;
@@ -7,13 +32,13 @@ ipcMain.handle('process-video-local', async (event, inputPath) => {
             .videoCodec('libx264')
             .audioCodec('aac')
             .outputOptions([
-                '-crf 20',                  // معدل متوازن يمنع تيك توك من ضغط الفيديو بقسوة
-                '-preset slow',             // ضغط هادئ يحافظ على تفاصيل البكسلات والحدّة
-                '-pix_fmt yuv420p',         // التوافق الإجباري مع ألوان منصات الويب
-                '-profile:v high',          // بروفايل عالي الجودة
-                '-level 4.2',               // ليفل مدعوم بالكامل لمنع إعادة المعالجة الخاطئة
-                '-b:a 192k',                // جودة صوت عالية
-                '-movflags +faststart'      // ترويسة التشغيل السريع والاعتماد
+                '-crf 20',
+                '-preset slow',
+                '-pix_fmt yuv420p',
+                '-profile:v high',
+                '-level 4.2',
+                '-b:a 192k',
+                '-movflags +faststart'
             ])
             .save(outputPath)
             .on('end', () => {
