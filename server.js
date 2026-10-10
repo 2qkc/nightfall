@@ -1,45 +1,65 @@
 const express = require('express');
+const multer = require('multer');
 const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
 
-// مسار معالجة الفيديو بالـ FFmpeg للسيرفر
-app.post('/process-video', (req, res) => {
-    const { inputPath } = req.body;
-    
-    if (!inputPath || !fs.existsSync(inputPath)) {
-        return res.status(400).json({ error: 'مسار الفيديو غير موجود أو غير صحيح' });
+// إعداد مسارات التخزين المؤقت
+const uploadDir = path.join(__dirname, 'uploads');
+const outputDir = path.join(__dirname, 'downloads');
+
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadDir),
+    filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+const upload = multer({ storage });
+
+// تفعيل قراءة الـ static files لعرض واجهة index.html
+app.use(express.static(__dirname));
+
+// الصفحة الرئيسية تعرض الواجهة الفخمة مباشرة
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// مسار معالجة الفيديو القادم من الواجهة
+app.post('/process-video', upload.single('video'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('لم يتم إرسال أي فيديو للمعالجة.');
     }
 
-    const outputFileName = `NIGHTFALL_SERVER_${Date.now()}.mp4`;
-    const outputPath = path.join(__dirname, 'downloads', outputFileName);
+    const inputPath = req.file.path;
+    const outputFileName = `NIGHTFALL_PROTECTED_${Date.now()}.mp4`;
+    const outputPath = path.join(outputDir, outputFileName);
 
-    // تأكد من وجود مجلد التحميلات
-    if (!fs.existsSync(path.join(__dirname, 'downloads'))) {
-        fs.mkdirSync(path.join(__dirname, 'downloads'));
-    }
-
-    // أمر الـ FFmpeg المعدل لتجاوز ضغط تيك توك والحفاظ على الجودة
+    // أمر الـ FFmpeg المضبوط لتجاوز ضغط تيك توك وتثبيت الـ 60 FPS وإزالة البصمات
     const ffmpegCommand = `ffmpeg -i "${inputPath}" -c:v libx264 -profile:v high -level 4.1 -crf 18 -preset medium -pix_fmt yuv420p -r 60 -g 120 -b:v 6M -b:a 192k -map_metadata -1 -movflags +faststart "${outputPath}"`;
 
     exec(ffmpegCommand, (error, stdout, stderr) => {
+        // حذف الملف الأصلي المرفوع فوراً لتوفير مساحة السيرفر
+        if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+
         if (error) {
-            console.error(`خطأ في المعالجة: ${error.message}`);
-            return res.status(500).json({ error: error.message });
+            console.error(`خطأ FFmpeg: ${error.message}`);
+            return res.status(500).send('فشلت معالجة الفيديو داخل السيرفر.');
         }
 
-        res.json({
-            success: true,
-            message: 'تمت معالجة الفيديو بنجاح عبر السيرفر!',
-            outputPath: outputPath
+        // إرسال الملف المعالج مباشرة للمتصفح للتحميل
+        res.download(outputPath, outputFileName, (err) => {
+            // حذف الملف المعالج بعد إرساله للمستخدم لتنظيف السيرفر
+            setTimeout(() => {
+                if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+            }, 10000);
         });
     });
 });
 
-const PORT = process.0 || 3000;
 app.listen(PORT, () => {
-    console.log(`سيرفر المعالجة يعمل بكفاءة على المنفذ ${PORT}`);
+    console.log(`NIGHTFALL Server running on port ${PORT}`);
 });
