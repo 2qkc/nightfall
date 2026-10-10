@@ -21,8 +21,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // تفعيل قراءة الـ static files لعرض واجهة index.html
-app.use(express.static(__dirname));
-
+app.use(express.static(path.join(__dirname, 'public')));
 // الصفحة الرئيسية تعرض الواجهة الفخمة مباشرة
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
