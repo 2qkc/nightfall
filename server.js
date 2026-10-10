@@ -1,17 +1,21 @@
 const express = require('express');
 const multer = require('multer');
 const ffmpeg = require('fluent-ffmpeg');
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// رفع حد حجم البيانات المستقبلة (لتجنب رفض الملفات الكبيرة)
+// تعيين مسار الـ ffmpeg تلقائياً ليعمل على سيرفر Render
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
+// رفع حد حجم البيانات المستقبلة للملفات الكبيرة (500 ميجابايت)
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
-// زيادة مهلة الاتصال للسيرفر لتتحمل وقت الرفع والمعالجة (10 دقائق)
+// زيادة مهلة الاتصال للسيرفر (10 دقائق) لتجنب انقطاع الرفع
 app.use((req, res, next) => {
     req.setTimeout(600000);
     res.setTimeout(600000);
